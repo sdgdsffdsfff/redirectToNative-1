@@ -141,6 +141,7 @@
             var self = this;
             var endTime = Date.now();
             if (endTime - startTime < self.openTime + 500) {
+                alert('未安装APP或者唤起失败');
 //                window.location = self.installUrl;
             }
         },
