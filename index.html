@@ -3,18 +3,43 @@
 <head>
     <meta charset="utf-8"/>
     <title>redirectToNative的demo</title>
+    <style>
+        .J_goNative {
+            margin: 20px 50px;
+            padding: 20px 50px;
+            border: 4px solid #1d36f2;
+            text-align: center;
+            font-size: 25px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 
-<div style="font-size:16px;color:#333" id="J_DownloadApp"   data-ios-native-url="yhd://oclockGroupon/" data-android-native-url="yhd://oclockGroupon/"
-     data-ios-install-url="https://itunes.apple.com/us/app/1hao-dian/id427457043?mt=8&tp=1.1.8.3.2.Ku6O0AJ-10-EPNKx"
-     data-android-install-url="http://cms.yhd.com/sale/157119">
-    如果没有自动下载，请手动
-    <a style="color:red;font-size:20px" href="http://cms.yhd.com/sale/157119">点此下载yhd客户端</a>，<br>
-    如果您不想安装客户端，也可以
-    <a style="color:red;font-size:20px" href="http://m.yhd.com/">直接访问yhd触屏版</a>，
-    同样有手机专享价以及优惠券！</div>
+<!--<div style="font-size:16px;color:#333" id="J_DownloadApp"   data-ios-native-url="yhd://oclockGroupon/" data-android-native-url="yhd://oclockGroupon/"-->
+<!--data-ios-install-url="https://itunes.apple.com/us/app/1hao-dian/id427457043?mt=8&tp=1.1.8.3.2.Ku6O0AJ-10-EPNKx"-->
+<!--data-android-install-url="http://cms.yhd.com/sale/157119">-->
+<!--如果没有自动下载，请手动-->
+<!--<a style="color:red;font-size:20px" href="http://cms.yhd.com/sale/157119">点此下载yhd客户端</a>，<br>-->
+<!--如果您不想安装客户端，也可以-->
+<!--<a style="color:red;font-size:20px" href="http://m.yhd.com/">直接访问yhd触屏版</a>，-->
+<!--同样有手机专享价以及优惠券！</div>-->
+<div class="J_goNative" data-type="yhd">
+    1号店
+</div>
+<div class="J_goNative" data-type="taobao">
+    淘宝
+</div>
+<div class="J_goNative" data-type="jd">
+    京东
+</div>
+<div class="J_goNative" data-type="dp">
+    大众点评
+</div>
+<div class="J_goNative" data-type="mt">
+    美团
+</div>
 <script>
     /**
      * @fileoverview
@@ -37,11 +62,11 @@
          * iosOpenTime: int 可选默认800ms， 启动ios客户端所需时间，一般ios平台整体性能不错，打开速度较快
          * androidOpenTime: int 可选默认2000ms，启动android客户端所需时间，android系统性能参差不齐所需启动时间也不齐，和android客户端本身启动时间也有关，比如3.0版本启动一淘客户端就平均比淘宝客户端要慢200ms
          */
-        init: function(config) {
+        init: function (config) {
             var self = this;
             self.platform = self._UA();
             // pc下 什么都不处理  pc访问下可能href可以链接去其他地址
-            if(!self.platform) return;
+            if (!self.platform) return;
             if (self.platform == 'ios') {
                 self.installUrl = config.iosInstallUrl;
                 self.nativeUrl = config.iosNativeUrl;
@@ -64,14 +89,14 @@
          * https://developers.google.com/chrome/mobile/docs/intents
          * @return {[type]}
          */
-        _hackChrome: function() {
+        _hackChrome: function () {
             var self = this;
             var startTime = Date.now();
             var paramUrlarr = self.nativeUrl.split('://'),
                     scheme = paramUrlarr[0],
                     schemeUrl = paramUrlarr[1];
             window.location = 'intent://' + schemeUrl + '#Intent;scheme=' + scheme + ';package=' + self.package + ';end';
-            setTimeout(function() {
+            setTimeout(function () {
                 self._gotoDownload(startTime);
             }, self.openTime);
         },
@@ -79,7 +104,7 @@
          * [_gotoNative 跳转至native，native超时打不开就去下载]
          * @return
          */
-        _gotoNative: function() {
+        _gotoNative: function () {
             var self = this;
             var startTime = Date.now(),
                     doc = document,
@@ -90,15 +115,15 @@
             iframe.src = self.nativeUrl;
 
             //运行在head中
-            if(!body) {
-                setTimeout(function(){
+            if (!body) {
+                setTimeout(function () {
                     doc.body.appendChild(iframe);
                 }, 0);
             } else {
                 body.appendChild(iframe);
             }
 
-            setTimeout(function() {
+            setTimeout(function () {
                 doc.body.removeChild(iframe);
                 self._gotoDownload(startTime);
                 /**
@@ -112,18 +137,18 @@
          * @param  {[type]} startTime [开始时间]
          * @return
          */
-        _gotoDownload: function(startTime) {
+        _gotoDownload: function (startTime) {
             var self = this;
             var endTime = Date.now();
             if (endTime - startTime < self.openTime + 500) {
-                window.location = self.installUrl;
+//                window.location = self.installUrl;
             }
         },
         /**
          * [_UA 检测平台]
          * @return string [ios|android| ]
          */
-        _UA: function() {
+        _UA: function () {
             var ua = navigator.userAgent;
             // ios
             if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
@@ -138,17 +163,57 @@
 
 
     //透传参数
-    var searchStr = document.getElementById('J_DownloadApp');
+    //    var searchStr = document.getElementById('J_DownloadApp');
 
-    var configObj = {
-                iosInstallUrl: searchStr.dataset.iosInstallUrl,
-                androidInstallUrl: searchStr.dataset.androidInstallUrl,
-                iosNativeUrl: searchStr.dataset.iosNativeUrl,
-                andriodNativeUrl: searchStr.dataset.androidNativeUrl,
-                package: 'com.yihaodian.yihaodian'
-            };
+    //    var configObj = {
+    //                iosInstallUrl: searchStr.dataset.iosInstallUrl,
+    //                androidInstallUrl: searchStr.dataset.androidInstallUrl,
+    //                iosNativeUrl: searchStr.dataset.iosNativeUrl,
+    //                andriodNativeUrl: searchStr.dataset.androidNativeUrl,
+    //                package: 'com.yihaodian.yihaodian'
+    //            };
 
-    RedirectToNative.init(configObj);
+    var nativeMap = {
+        yhd: {
+            iosNativeUrl: 'yhd://oclockGroupon/',
+            andriodNativeUrl: 'yhd://oclockGroupon/',
+            package: 'xxxxx'
+        },
+        taobao: {
+            iosNativeUrl: 'taobao://home',
+            andriodNativeUrl: 'taobao://home',
+            package: 'com.taobao.taobao'
+        },
+        jd: {
+            iosNativeUrl: 'openApp.jdMobile://360buy?type=1',
+            andriodNativeUrl: 'openApp.jdMobile://360buy?type=1',
+            package: 'com.jingdong.app.mall'
+        },
+        dp: {
+            iosNativeUrl: 'dianping://home?utm_=w_mhome_float',
+            andriodNativeUrl: 'dianping://home?utm_=w_mhome_float',
+            package: 'com.dianping.v1'
+        },
+        mt: {
+            iosNativeUrl: 'imeituan://www.meituan.com',
+            andriodNativeUrl: 'imeituan://www.meituan.com',
+            package: 'xxxx'
+        }
+    };
+
+
+    var J_goNative = document.querySelectorAll('.J_goNative');
+
+    J_goNative = [].slice.call(J_goNative);
+
+    J_goNative.forEach(function(cur){
+        cur.addEventListener('click',function(){
+            var type = this.getAttribute('data-type');
+            RedirectToNative.init(nativeMap[type]);
+        });
+    });
+
+
 </script>
 </body>
 </html>
